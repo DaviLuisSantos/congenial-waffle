@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Usuários</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+</head>
+
+<body>
+    <h2>Lista de Usuários</h2>
+    <button id="show-users-button">Mostrar Usuários</button>
+    <table id="user-table" class="display">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Telefone</th>
+                <th>Endereço</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Os usuários serão adicionados dinamicamente aqui -->
+        </tbody>
+    </table>
+
+    <div id="user-details-modal" style="display: none;">
+        <h3>Detalhes do Usuário</h3>
+        <div id="user-details-content"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var dataTable;
+
+            $('#show-users-button').click(function () {
+                if (dataTable) {
+                    dataTable.destroy();
+                }
+
+                dataTable = $('#user-table').DataTable({
+                    destroy: true,
+                    ajax: {
+                        url: '/users',
+                        method: 'GET',
+                        dataType: 'json',
+                        dataSrc: ''
+                    },
+                    columns: [
+                        { data: 'full_name' },
+                        { data: 'email' },
+                        { data: 'phone' },
+                        { data: 'address' },
+                        {
+                            data: null,
+                            render: function (data, type, row) {
+                                return '<button class="details-button" data-id="' + data.user_id + '">Detalhes</button>' +
+                                    '<button class="delete-button" data-id="' + data.user_id + '">Excluir</button>';
+                            }
+                        }
+                    ]
+                });
+            });
+
+            $('#user-table').on('click', '.details-button', function () {
+                var userId = $(this).data('id');
+
+                $.ajax({
+                    url: '/users/' + userId,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (user) {
+                        var detailsContent = '<strong>Nome:</strong> ' + user.full_name + '<br>' +
+                            '<strong>Email:</strong> ' + user.email + '<br>' +
+                            '<strong>Telefone:</strong> ' + user.phone + '<br>' +
+                            '<strong>Endereço:</strong> ' + user.address + '<br>';
+
+                        $.each(user.educations, function (index, education) {
+                            detailsContent += '<strong>Educação:</strong> ' + education.course + ' - ' + education.institution + '<br>';
+                        });
+
+                        $.each(user.skills, function (index, skill) {
+                            detailsContent += '<strong>Habilidade:</strong> ' + skill.skill_name + ' - ' + skill.proficiency_level + '<br>';
+                        });
+
+                        // Adicione mais informações das outras tabelas aqui...
+
+                        $('#user-details-content').html(detailsContent);
+                        $('#user-details-modal').show();
+                    },
+                    error: function (error) {
+                        console.error('Erro ao obter detalhes do usuário:', error);
+                    }
+                });
+            });
+
+            $('#user-table').on('click', '.delete-button', function () {
+                var userId = $(this).data('id');
+
+                $.ajax({
+                    url: '/users/' + userId,
+                    method: 'DELETE',
+                    success: function () {
+                        // Atualize a tabela para refletir a exclusão do usuário
+                        dataTable.ajax.reload(null, false);
+                    },
+                    error: function (error) {
+                        console.error('Erro ao excluir o usuário:', error);
+                    }
+                });
+            });
+
+            // Feche o modal de detalhes ao clicar fora dele
+            $(document).click(function (event) {
+                if ($(event.target).closest('#user-details-modal').length === 0) {
+                    $('#user-details-modal').hide();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

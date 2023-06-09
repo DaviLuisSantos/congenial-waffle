@@ -1,0 +1,4 @@
+node_modules/    # Ignora o diretório node_modules e todo o seu conteúdo
+.env             # Ignora o arquivo .env
+.DS_Store        # Ignora o arquivo .DS_Store (específico para macOS)
+logs/            # Ignora o diretório logs e todo o seu conteúdo
