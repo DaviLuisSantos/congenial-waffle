@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const router = express.Router();
 
-app.use(express.static('public'));
+app.use(express.static('src'));
 
 // Rota inicial
 router.get('/', (req, res) => {

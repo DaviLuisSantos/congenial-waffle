@@ -18,4 +18,10 @@ router.put('/:userId', userController.updateUser);
 // Rota para excluir um usuário
 router.delete('/:userId', userController.deleteUser);
 
+// Rota para registrar um novo usuário
+router.post('/register', userController.registerUser);
+
+// Rota para autenticar um usuário
+router.post('/login', userController.authenticateUser);
+
 module.exports = router;

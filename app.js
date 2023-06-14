@@ -1,6 +1,8 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
-
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 // Importe as rotas
 const indexRoutes = require('./routes/index');
 // Importe as rotas relacionadas a cada modelo
